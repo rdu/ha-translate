@@ -3,7 +3,7 @@ import urllib.request, urllib.parse
 import json
 
 OPENHAB_URL = "http://10.10.0.137:8080/rest/"
-SAY_TOPIC = "raspi-1/speak"
+SAY_TOPIC = "temp-raspi-1/speak"
 
 
 class Base:
@@ -95,10 +95,53 @@ class Sensors(Base):
             print(e)
         command_processor.say("dieser sensor scheint nicht aktiv zu sein")
 
+
+class Common(Base):
+    def __init__(self):
+        pass
+
+    def get_key(self):
+        return "Common"
+
+    def create_key(intent, params):
+        if intent != "Common":
+            return None
+        return "Common"
+
+    def process(self, text, command_processor):
+        try:
+            if text == "uhrzeit":
+                from time import gmtime, strftime
+                _str = strftime("es ist gerade %H Uhr %M", gmtime())
+                command_processor.say(_str)
+            if text == "datum":
+                from time import gmtime, strftime
+                _str = strftime("heute ist der %d.%m.", gmtime())
+                command_processor.say(_str)
+            if text == "wetter":
+                url = "http://dataservice.accuweather.com/currentconditions/v1/129842_PC?apikey=Lqm0HAtqCrGJwmZmTvfv38YS02F7tFki&language=de-de&details=false"
+                result = urllib.request.urlopen(url).read()
+                value = json.loads(result.decode("utf-8"))
+                result = "hier das aktuelle Wetter: " + value[0]['WeatherText'] + " bei " + str(value[0]['Temperature']['Metric']['Value']) + " Grad Celsius"
+                command_processor.say(result)
+            if text == "wettervorhersage":
+                url = "http://dataservice.accuweather.com/forecasts/v1/daily/1day/129842_PC?apikey=Lqm0HAtqCrGJwmZmTvfv38YS02F7tFki&language=de-de&metric=true"
+                result = urllib.request.urlopen(url).read()
+                value = json.loads(result.decode("utf-8"))
+                result = "so wird das Wetter heute: " + value['Headline']['Text'] + " bei temperaturen von " + str(value['DailyForecasts'][0]['Temperature']['Minimum']['Value']).replace(".", ",") + " bis " + str(value['DailyForecasts'][0]['Temperature']['Maximum']['Value']).replace('.', ',') + " Grad Celsius"
+                command_processor.say(result)
+
+            return
+        except Exception as e:
+            print(e)
+        command_processor.say("die Frage kann ich aktuell nicht beantworten, weil ein Fehler aufgetreten ist")
+
+
 class CommandProcessor:
     intents = [
         SwitchDevice,
-        Sensors
+        Sensors,
+        Common
     ]
     devices = {}
 
@@ -156,6 +199,13 @@ class CommandProcessor:
         self.add(Sensors(sen_floor, sen_temperature))
         self.add(Sensors(sen_sleeproom, sen_temperature))
         self.add(Sensors(sen_workroom, sen_temperature))
+        ######################################################
+        ######################################################
+
+        ######################################################
+        # common
+        ######################################################
+        self.add(Common())
         ######################################################
         ######################################################
 
