@@ -7,6 +7,7 @@ RUN apt-get install -y python3-all-dev python3-pip build-essential swig git libp
 ENV LANG C.UTF-8
 RUN pip3 install paho-mqtt
 RUN pip3 install apiai
+RUN pip3 install pytz
 WORKDIR /home
 COPY CommandProcessor.py /home/CommandProcessor.py
 COPY Run.py /home/Run.py

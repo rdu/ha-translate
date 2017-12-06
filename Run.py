@@ -3,6 +3,7 @@ import paho.mqtt.client as mqtt
 import json
 import apiai
 import uuid
+import os
 
 CLIENT_ACCESS_TOKEN = os.getenv('DIALOGFLOW_TOKEN')
 
@@ -24,8 +25,8 @@ def on_message(client, userdata, msg):
       data = json.loads(response.read().decode("utf-8"))
       processor = CommandProcessor(client)
       processor.process(data)
-    except:
-      print("error occured")
+    except Exception as a:
+      print("error occured",a)
 
 
 def main():

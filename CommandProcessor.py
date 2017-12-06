@@ -1,9 +1,13 @@
 from urllib.request import Request
 import urllib.request, urllib.parse
 import json
+from time import gmtime, strftime
+from datetime import datetime
+from pytz import timezone
+
 
 OPENHAB_URL = "http://10.10.0.137:8080/rest/"
-SAY_TOPIC = "temp-raspi-1/speak"
+SAY_TOPIC = "raspi-1/speak"
 
 
 class Base:
@@ -111,12 +115,12 @@ class Common(Base):
     def process(self, text, command_processor):
         try:
             if text == "uhrzeit":
-                from time import gmtime, strftime
-                _str = strftime("es ist gerade %H Uhr %M", gmtime())
+                t = timezone('Europe/Berlin')
+                _str = datetime.now(t).strftime("es ist gerade %H Uhr %M")
                 command_processor.say(_str)
             if text == "datum":
-                from time import gmtime, strftime
-                _str = strftime("heute ist der %d.%m.", gmtime())
+                t = timezone('Europe/Berlin')
+                _str = datetime.now(t).strftime("heute ist der %d.%m.")
                 command_processor.say(_str)
             if text == "wetter":
                 url = "http://dataservice.accuweather.com/currentconditions/v1/129842_PC?apikey=Lqm0HAtqCrGJwmZmTvfv38YS02F7tFki&language=de-de&details=false"
@@ -240,4 +244,4 @@ class CommandProcessor:
 
     def say(self, text):
         print("say: " + text)
-        self.mqtt_client.publish(SAY_TOPIC, text)
+        self.mqtt_client.publish(SAY_TOPIC, text.encode('iso-8859-1'))
