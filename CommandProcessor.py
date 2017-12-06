@@ -246,7 +246,7 @@ class Common(Base):
                     text.append("Heute ist es ganz schön kalt, bitte lange warme Sachen anziehen")
                 elif _min >= 0:
                     text.append("Bitte lange warme Sachen anziehen, es wird sehr kalt draußen!")
-                    text.append("Heute ist sehr kalt, bitte lange warme Sachen anziehen")
+                    text.append("Heute ist es sehr kalt, bitte lange warme Sachen anziehen")
                 elif _min >= -5:
                     text.append("Bitte lange warme Sachen anziehen, es wird verdammt kalt draußen!")
                     text.append("Heute ist richtig kalt, bitte lange warme Sachen anziehen")
